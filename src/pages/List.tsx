@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 const List = () => {
@@ -12,7 +13,9 @@ const List = () => {
       <h1>Names List</h1>
       <ul>
         {query?.data?.players.map((name) => (
-          <li key={name}>{name}</li>
+          <li key={name}>
+            <Link to={{ pathname: `profile/${name}` }}>{name}</Link>
+          </li>
         ))}
       </ul>
     </div>
