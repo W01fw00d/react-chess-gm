@@ -7,7 +7,16 @@ const List = () => {
     queryKey: [GET_ALL_GRANDMASTERS],
   });
 
-  return <>{query?.data?.players}</>;
+  return (
+    <div>
+      <h1>Names List</h1>
+      <ul>
+        {query?.data?.players.map((name) => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default List;
