@@ -1,49 +1,17 @@
 import { Link, useParams } from "react-router-dom";
-
 import { useQuery } from "@tanstack/react-query";
-import { timeDifference } from "../utils/date";
 
-enum Status {
-  closed,
-  "closed:fair_play_violations",
-  basic,
-  premium,
-  mod,
-  staff,
-}
-
-// Based on https://www.chess.com/news/view/published-data-api#pubapi-endpoint-games-archive
-type Response = {
-  "@id": string; // Do not display, doesn't seem like an url a end-user should see
-  url: string;
-  username: string;
-  player_id: number;
-  title?: string; // Optional
-  status: Status;
-  name?: string; // Optional
-  avatar?: string; // Optional
-  location?: string; // Optional
-  country: string;
-  joined: number; // timestamp
-  last_online: number; // timestamp
-  followers: number;
-  is_streamer: boolean;
-  twitch_url: string;
-  fide: number;
-
-  // Docs doesn't seem to be updated, they don't include some extra fields that sometimes are on the response:
-  league: string;
-  streaming_platforms: string[];
-  verified: boolean;
-};
+import useClock from "../hooks/useClock";
+import { Player } from "../types/Player";
 
 const ExternalLink = ({ url }: { url: string }) => <a href={url}>{url}</a>;
 
 const Profile = () => {
   const { username } = useParams();
 
-  const query = useQuery<Response>({
+  const query = useQuery<Player>({
     queryKey: [`player/${username}`],
+    // refetchInterval: 1000, // Refetch every second
   });
 
   const { data } = query;
@@ -51,8 +19,21 @@ const Profile = () => {
   const joinedInDate = new Date(0);
   joinedInDate.setUTCSeconds(data?.joined || 0);
 
-  const lastOnlineDate = new Date(0);
-  lastOnlineDate.setUTCSeconds(data?.last_online || 0);
+  /*
+  [Note]
+  I assume Step 3 "...it should update every second." means
+  just updating the current exact time minus the last response result.
+  I understand it doesn't mean doing a request every second
+  to get the most updated `data.last_online` possible.
+
+  This second requirement could be accomplished by refetching every second,
+  but it would be quite expensive in performance.
+
+  Best solution would to use WebSockets to achieve that,
+  which would involve implementing a WebSocket server:
+  https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+  */
+  const { timeSincelastOnline } = useClock();
 
   return (
     <div>
@@ -73,11 +54,13 @@ const Profile = () => {
           </div>
           <br />
           <div>Joined in: {joinedInDate.toLocaleDateString()}</div>
-          <div>
-            <b>
-              Time since user was last online: {timeDifference(lastOnlineDate)}
-            </b>
-          </div>
+
+          {timeSincelastOnline && (
+            <div>
+              <b>Time since user was last online: {timeSincelastOnline}</b>
+            </div>
+          )}
+
           <br />
           {data.title && <div>Title: {data.title}</div>}
           <div>League: {data.league}</div>
