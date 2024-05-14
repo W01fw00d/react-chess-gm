@@ -4,7 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import useClock from "../hooks/useClock";
 import { Player } from "../types/Player";
 
-const ExternalLink = ({ url }: { url: string }) => <a href={url}>{url}</a>;
+import pageStyles from "./Page.module.css";
+import profileStyles from "./Profile.module.css";
+
+const ExternalLink = ({ url, label }: { url: string; label?: string }) => (
+  <a href={url}>{label || url}</a>
+);
 
 const Profile = () => {
   const { username } = useParams();
@@ -14,7 +19,7 @@ const Profile = () => {
     // refetchInterval: 1000, // Refetch every second
   });
 
-  const { data } = query;
+  const { data, isLoading } = query;
 
   const joinedInDate = new Date(0);
   joinedInDate.setUTCSeconds(data?.joined || 0);
@@ -35,42 +40,48 @@ const Profile = () => {
   */
   const { timeSincelastOnline } = useClock();
 
-  return (
-    <div>
-      {data && (
-        <div>
-          {data.avatar && (
-            <img src={data.avatar} alt={`${data.username}'s Avatar`} />
-          )}
-          <div>Username: {data.username}</div>
-          {data.name && <div>Full name: {data.name}</div>}
-          <div>
-            Url: <ExternalLink url={data.url} />
-          </div>
-          <br />
-          {data.location && <div>Location: {data.location}</div>}
-          <div>
-            Country Url: <ExternalLink url={data.country} />
-          </div>
-          <br />
-          <div>Joined in: {joinedInDate.toLocaleDateString()}</div>
+  if (isLoading || !data) {
+    return <div className={pageStyles.page}>Loading...</div>;
+  }
 
+  return (
+    <div className={pageStyles.page}>
+      <div className={profileStyles.userInfo}>
+        {data.avatar && (
+          <div>
+            <img src={data.avatar} alt={`${data.username}'s Avatar`} />
+          </div>
+        )}
+        <div>
+          <div>
+            👤 User: <ExternalLink url={data.url} label={data.username} />
+          </div>
+          {data.name && <div>✍ Name: {data.name}</div>}
+          <div>
+            🌍 Location:{" "}
+            <ExternalLink url={data.country} label={data.location} />
+          </div>
+        </div>
+      </div>
+      <div className={profileStyles.container}>
+        <div className={profileStyles.item}>
+          <div>🚩 Joined in: {joinedInDate.toLocaleDateString()}</div>
           {timeSincelastOnline && (
             <div>
-              <b>Time since user was last online: {timeSincelastOnline}</b>
+              <b>⏳ Last online: {timeSincelastOnline}</b>
             </div>
           )}
+          <div>🏅 League: {data.league}</div>
+          {data.title && <div>📋 Title: {data.title}</div>}
+          {data.fide && <div>🎖 FIDE rating: {data.fide}</div>}
+        </div>
 
-          <br />
-          {data.title && <div>Title: {data.title}</div>}
-          <div>League: {data.league}</div>
-          <div>FIDE rating: {data.fide}</div>
-          <br />
-          <div>Followers: {data.followers}</div>
-          <div>Is streamer? {data.is_streamer ? "Yes" : "No"} </div>
+        <div className={profileStyles.item}>
+          <div>👥 Followers: {data.followers}</div>
+          <div>🎤 Is streamer? {data.is_streamer ? "Yes" : "No"} </div>
           {data.streaming_platforms?.length > 0 && (
             <div>
-              Streaming Platforms:
+              📃 Streaming Platforms:
               {data.streaming_platforms.map((platform) => (
                 <div>{platform}</div>
               ))}
@@ -78,19 +89,21 @@ const Profile = () => {
           )}
           {data.twitch_url && (
             <div>
-              Twitch Url: <ExternalLink url={data.twitch_url} />
+              💻 Twitch Url: <ExternalLink url={data.twitch_url} />
             </div>
           )}
-          <br />
-          <div>ID: {data.player_id}</div>
-          <div>Status: {data.status}</div>
-          <div>Is verified? {data.verified ? "Yes" : "No"} </div>
         </div>
-      )}
 
-      <br />
-      <br />
-      <Link to={{ pathname: "/" }}>Go back to list</Link>
+        <div className={profileStyles.item}>
+          <div>📃 ID: {data.player_id}</div>
+          <div>⭐ Status: {data.status}</div>
+          <div>🔒 Is verified? {data.verified ? "Yes" : "No"} </div>
+        </div>
+      </div>
+
+      <Link to={{ pathname: "/" }}>
+        <b>↩ Go back to list</b>
+      </Link>
     </div>
   );
 };

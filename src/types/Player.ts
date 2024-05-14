@@ -24,7 +24,7 @@ export type Player = {
   followers: number;
   is_streamer: boolean;
   twitch_url: string;
-  fide: number;
+  fide?: number; // Optional, although docs define it as required
 
   // Docs doesn't seem to be updated, they don't include some extra fields that sometimes are on the response:
   league: string;

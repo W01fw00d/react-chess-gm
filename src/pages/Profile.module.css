@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+
+  margin-bottom: 56px;
+}
+
+.item {
+  flex-grow: 1;
+}
+
+.userInfo {
+  display: flex;
+  gap: 24px;
+
+  margin-bottom: 64px;
+}

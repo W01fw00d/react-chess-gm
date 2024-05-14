@@ -4,8 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import List from "./pages/List";
 import Profile from "./pages/Profile";
 
-import "./App.css";
-
 // TODO: ideally, this constant should be stored on an environment variable, not commited to the repository:
 const API_BASE_URL = "https://api.chess.com/pub";
 
