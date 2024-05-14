@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
+import { timeDifference } from "../utils/date";
 
 enum Status {
   closed,
@@ -45,8 +46,6 @@ const Profile = () => {
     queryKey: [`player/${username}`],
   });
 
-  console.log({ data: query.data });
-
   const { data } = query;
 
   const joinedInDate = new Date(0);
@@ -59,22 +58,28 @@ const Profile = () => {
     <div>
       {data && (
         <div>
-          <img src={data.avatar} alt={`${data.username}'s Avatar`} />
+          {data.avatar && (
+            <img src={data.avatar} alt={`${data.username}'s Avatar`} />
+          )}
           <div>Username: {data.username}</div>
-          <div>Full name: {data.name}</div>
+          {data.name && <div>Full name: {data.name}</div>}
           <div>
             Url: <ExternalLink url={data.url} />
           </div>
           <br />
-          <div>Location: {data.location}</div>
+          {data.location && <div>Location: {data.location}</div>}
           <div>
             Country Url: <ExternalLink url={data.country} />
           </div>
           <br />
           <div>Joined in: {joinedInDate.toLocaleDateString()}</div>
-          <div>Last online: {lastOnlineDate.toLocaleDateString()}</div>
+          <div>
+            <b>
+              Time since user was last online: {timeDifference(lastOnlineDate)}
+            </b>
+          </div>
           <br />
-          <div>Title: {data.title}</div>
+          {data.title && <div>Title: {data.title}</div>}
           <div>League: {data.league}</div>
           <div>FIDE rating: {data.fide}</div>
           <br />
